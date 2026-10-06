@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Cek Nilai UTS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#2740d9;
+  --card:#ffffff;
+  --ink:#16193a;
+  --muted:#5d6286;
+  --line:#dfe2f5;
+  --accent:#ffd84d;
+  --accent-ink:#16193a;
+  --field:#f4f5fd;
+  --bad:#e5484d;   --bad-bg:#fdecec;
+  --mid:#d98a00;   --mid-bg:#fff4d6;
+  --good:#12a05c;  --good-bg:#e3f7ec;
+  --display:"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif;
+  --body:"DM Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#141a52; --card:#1d2263; --ink:#f1f2ff; --muted:#aab0e6; --line:#323a8c;
+    --field:#161b55; --bad-bg:#4a1f3a; --mid-bg:#4a3d17; --good-bg:#15423a;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#141a52; --card:#1d2263; --ink:#f1f2ff; --muted:#aab0e6; --line:#323a8c;
+  --field:#161b55; --bad-bg:#4a1f3a; --mid-bg:#4a3d17; --good-bg:#15423a;
+}
+*,*::before,*::after{box-sizing:inherit}
+html,body{height:100%;margin:0}
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:var(--body);
+  font-size:16px;
+  line-height:1.5;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+}
+.shell{width:100%;max-width:420px}
+.brand{
+  font-family:var(--display);
+  font-weight:800;
+  color:#fff;
+  font-size:2.6rem;
+  line-height:1.02;
+  letter-spacing:-.02em;
+  margin:0 0 6px;
+}
+.brand span{background:var(--accent);color:var(--accent-ink);padding:0 .22em;border-radius:.18em;display:inline-block;transform:rotate(-2deg)}
+.sub{color:#dfe4ff;margin:0 0 22px}
+.card{
+  background:var(--card);
+  border-radius:22px;
+  padding:26px 22px;
+  box-shadow:0 18px 40px -18px rgba(5,10,60,.6);
+}
+h2{font-family:var(--display);font-size:1.5rem;margin:0 0 4px;letter-spacing:-.01em}
+.hint{color:var(--muted);margin:0 0 18px;font-size:.95rem}
+label{display:block;font-weight:700;font-size:.92rem;margin-bottom:6px}
+input{
+  width:100%;
+  font:inherit;
+  font-size:1.1rem;
+  font-weight:500;
+  color:var(--ink);
+  background:var(--field);
+  border:2px solid var(--line);
+  border-radius:14px;
+  padding:14px 16px;
+  letter-spacing:.04em;
+}
+input:focus{outline:3px solid var(--accent);outline-offset:1px;border-color:var(--ink)}
+.btn{
+  font:inherit;
+  font-weight:700;
+  cursor:pointer;
+  border:0;
+  border-radius:14px;
+  padding:14px 18px;
+  background:var(--accent);
+  color:var(--accent-ink);
+  width:100%;
+  margin-top:14px;
+  font-size:1.02rem;
+}
+.btn:hover{filter:brightness(.96)}
+.btn:active{transform:translateY(1px)}
+.btn:focus-visible,.mapel:focus-visible,.link:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.err{
+  margin:12px 0 0;
+  padding:10px 12px;
+  border-radius:12px;
+  background:var(--bad-bg);
+  color:var(--bad);
+  font-weight:500;
+  font-size:.94rem;
+}
+[hidden]{display:none!important}
+.who{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:18px}
+.who .nm{font-family:var(--display);font-weight:700;font-size:1.3rem;line-height:1.15}
+.who .kd{color:var(--muted);font-size:.9rem}
+.link{
+  background:none;border:0;font:inherit;font-weight:700;color:var(--muted);
+  cursor:pointer;padding:4px 2px;text-decoration:underline;text-underline-offset:3px;white-space:nowrap
+}
+.mapel-grid{display:grid;gap:12px}
+.mapel{
+  font:inherit;
+  cursor:pointer;
+  display:flex;align-items:center;gap:16px;
+  text-align:left;
+  background:var(--field);
+  color:var(--ink);
+  border:2px solid var(--line);
+  border-radius:18px;
+  padding:16px;
+}
+.mapel:hover{border-color:var(--ink)}
+.mapel .ic{
+  flex:none;width:58px;height:58px;border-radius:16px;
+  display:grid;place-items:center;
+  background:var(--accent);color:var(--accent-ink);
+}
+.mapel:nth-child(2) .ic{background:#7cf0c1}
+.mapel[disabled]{opacity:.6;cursor:not-allowed;border-style:dashed}
+.mapel[disabled]:hover{border-color:var(--line)}
+.mapel[disabled] .ic{background:var(--line);color:var(--muted)}
+.badge{display:inline-block;margin-top:6px;padding:2px 10px;border-radius:999px;font-size:.82rem;font-weight:700}
+.b-done{background:var(--good-bg);color:var(--good)}
+.b-wait{background:var(--mid-bg);color:var(--mid)}
+.mapel .t{font-family:var(--display);font-weight:700;font-size:1.2rem;line-height:1.1}
+.score-wrap{text-align:center;padding:8px 0 4px}
+.mp-name{font-weight:700;color:var(--muted);margin:0 0 4px}
+.score{
+  font-family:var(--display);
+  font-weight:800;
+  font-size:6.5rem;
+  line-height:1;
+  letter-spacing:-.04em;
+  margin:0;
+}
+.msg{
+  display:inline-block;
+  margin-top:14px;
+  padding:10px 18px;
+  border-radius:14px;
+  font-family:var(--display);
+  font-weight:800;
+  font-size:1.4rem;
+}
+.s-bad .score{color:var(--bad)}   .s-bad .msg{background:var(--bad-bg);color:var(--bad)}
+.s-mid .score{color:var(--mid)}   .s-mid .msg{background:var(--mid-bg);color:var(--mid)}
+.s-good .score{color:var(--good)} .s-good .msg{background:var(--good-bg);color:var(--good)}
+.s-none .score{color:var(--muted);font-size:3rem}
+.s-none .msg{background:var(--field);color:var(--muted);font-size:1.05rem;font-weight:700}
+.pop{animation:pop .35s cubic-bezier(.2,1.4,.4,1)}
+@keyframes pop{from{transform:scale(.85);opacity:0}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){.pop{animation:none}}
+.foot{color:#c4ccff;text-align:center;font-size:.85rem;margin-top:16px}
+</style>
+</head>
+<body>
+<div class="shell">
+  <h1 class="brand">Cek Nilai <span>UTS</span></h1>
+  <p class="sub">Kelas X DKV</p>
+
+  <!-- LOGIN -->
+  <section class="card" id="vLogin">
+    <h2>Masuk</h2>
+    <p class="hint">Masukkan kode nomor peserta kamu.</p>
+    <label for="kode">Kode nomor peserta</label>
+    <input id="kode" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="contoh: XDKV1-001" inputmode="text">
+    <p class="err" id="err" role="alert" hidden></p>
+    <button class="btn" id="btnLogin" type="button">Masuk</button>
+  </section>
+
+  <!-- PILIH MAPEL -->
+  <section class="card" id="vMenu" hidden>
+    <div class="who">
+      <div>
+        <div class="nm" id="nm"></div>
+        <div class="kd" id="kd"></div>
+      </div>
+      <button class="link" id="btnKeluar1" type="button">Keluar</button>
+    </div>
+    <h2>Pilih mapel</h2>
+    <p class="hint">Tap mapel yang sudah dinilai buat lihat nilai UTS kamu.</p>
+    <div class="mapel-grid">
+      <button class="mapel" type="button" data-key="dkgv" disabled aria-disabled="true">
+        <span class="ic" aria-hidden="true">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 0 18c1.4 0 2-.9 2-1.8 0-1.2-.9-1.5-.9-2.6 0-1 .8-1.6 1.8-1.6H17a4 4 0 0 0 4-4C21 6.8 17 3 12 3z"/><circle cx="7.5" cy="11" r="1" fill="currentColor"/><circle cx="10.5" cy="7.5" r="1" fill="currentColor"/><circle cx="15" cy="7.5" r="1" fill="currentColor"/></svg>
+        </span>
+        <span><span class="t" style="display:block">Desain Komputer Grafis dan Visual</span><span class="badge b-wait">Belom Dinilai</span></span>
+      </button>
+      <button class="mapel" type="button" data-key="koding">
+        <span class="ic" aria-hidden="true">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 7l-5 5 5 5"/><path d="M16 7l5 5-5 5"/><path d="M14 4l-4 16"/></svg>
+        </span>
+        <span><span class="t" style="display:block">Koding dan Kecerdasan Artifisial</span><span class="badge b-done">Sudah Dinilai</span></span>
+      </button>
+    </div>
+  </section>
+
+  <!-- HASIL NILAI -->
+  <section class="card" id="vHasil" hidden>
+    <div class="who">
+      <div>
+        <div class="nm" id="nm2"></div>
+        <div class="kd" id="kd2"></div>
+      </div>
+      <button class="link" id="btnKeluar2" type="button">Keluar</button>
+    </div>
+    <div class="score-wrap" id="scoreWrap">
+      <p class="mp-name" id="mpName"></p>
+      <p class="score" id="score"></p>
+      <div class="msg" id="msg"></div>
+    </div>
+    <button class="btn" id="btnBack" type="button">Lihat mapel lain</button>
+  </section>
+
+  <p class="foot">Nilai tidak sesuai? Hubungi guru mapel.</p>
+</div>
+
+<script>
+/* ============================================================
+   DATA SISWA (semua kelas X DKV)
+   Kolom: kode, nama, kelas, dkgv, koding
+   dkgv  = Desain Komputer Grafis dan Visual (belum dinilai, kosong)
+   koding = Koding dan Kecerdasan Artifisial
+   ============================================================ */
+const CSV_DATA = `
+kode,nama,kelas,dkgv,koding
+XDKV1-001,ABDUL HAZIN,X DKV 1,,14
+XDKV1-002,ADELIA MARISKA,X DKV 1,,94
+XDKV1-003,AHMAD ARDIANSYAH,X DKV 1,,55
+XDKV1-004,AHMAD BAHRUL ULUM ADEEBA,X DKV 1,,84
+XDKV1-005,AHMAD RAFIF ZAKI,X DKV 1,,27
+XDKV1-006,ALDIO FAHREZA BRAHMANTYO,X DKV 1,,24
+XDKV1-007,ALEXANDRA AFRIANDO,X DKV 1,,53
+XDKV1-008,ANANDA ABIZAR MANOVA,X DKV 1,,54
+XDKV1-009,ANDREW CHRISTIANSON PHAN,X DKV 1,,96
+XDKV1-010,ANDROMEDA RONA MILANO TAMPUBOLON,X DKV 1,,98
+XDKV1-011,ATIKA MAY SEVIYA VITA,X DKV 1,,53
+XDKV1-012,AZ-ZAIN UBAIDILLAH FATTAHURROZAQ,X DKV 1,,67
+XDKV1-013,BAGUS SETIAWAN,X DKV 1,,46
+XDKV1-014,BUNGA DESA,X DKV 1,,13
+XDKV1-015,CHIKA NURUL ULFA,X DKV 1,,93
+XDKV1-016,DAVIN KEITARO ARDANA,X DKV 1,,100
+XDKV1-017,ELLENA HOSHANA MIRACLE ANGELIA,X DKV 1,,82
+XDKV1-018,ELVAN BIMA PURNOMO,X DKV 1,,63
+XDKV1-019,JUNIVA AJENG LESTARI,X DKV 1,,91
+XDKV1-020,LATIF MUTTAQIN,X DKV 1,,59
+XDKV1-021,NABILAH SYAFIQ,X DKV 1,,97
+XDKV1-022,NADIA AZZAHRA PUTRI,X DKV 1,,66
+XDKV1-023,NADYA PUTRI OKTAVIANI,X DKV 1,,93
+XDKV1-024,NESYA LOUDY SHAFIRA,X DKV 1,,93
+XDKV1-025,OWEN KARNADI,X DKV 1,,78
+XDKV1-026,PANJI MAULANA AFAN,X DKV 1,,90
+XDKV1-027,RADITHYA DANISH PRAMUDIANTO,X DKV 1,,66
+XDKV1-028,RAIFA AZRILIA,X DKV 1,,94
+XDKV1-029,RANGGI ANA NUR FADILLAH,X DKV 1,,44
+XDKV1-030,SHANTY,X DKV 1,,96
+XDKV1-031,SHAULA IZZATUNNISA,X DKV 1,,85
+XDKV1-032,THEODORE MARCELL MENDROFA,X DKV 1,,89
+XDKV1-033,TIFFANY ALMIRA PRAMESTY,X DKV 1,,90
+XDKV1-034,VINCENTIUS,X DKV 1,,86
+XDKV1-035,VINO ALDIANO FIRMANSYAH,X DKV 1,,54
+XDKV1-036,ZAHRAN SULAEMAN,X DKV 1,,91
+XDKV2-001,AGIESTA TRIANITA SYABANA,X DKV 2,,81
+XDKV2-002,ALIFATUL NUR SYAFIRA,X DKV 2,,78
+XDKV2-003,ANGELINE JOANNA TAN JUNAIDI,X DKV 2,,98
+XDKV2-004,ANITA RAHAYU,X DKV 2,,88
+XDKV2-005,AULIYA SABRINA,X DKV 2,,65
+XDKV2-006,BINTORO SETYO WIBISONO,X DKV 2,,34
+XDKV2-007,CITRA NASYWA ASSYIFA,X DKV 2,,70
+XDKV2-008,DAAZTAN WILIM,X DKV 2,,24
+XDKV2-009,ELANG ARYA RAMADHAN,X DKV 2,,78
+XDKV2-010,EVELYN DEWI,X DKV 2,,99
+XDKV2-011,FAHMI AMILUL FATA,X DKV 2,,85
+XDKV2-012,FALIH IBNI BASHAR,X DKV 2,,70
+XDKV2-013,FARHAN NATAKUSUMA,X DKV 2,,81
+XDKV2-014,KAYLA CAHYA REGINA PUTRI,X DKV 2,,77
+XDKV2-015,KEYLA SHIFA AWALIYAH,X DKV 2,,76
+XDKV2-016,KEYSHA MAHESWARI RAFIANTO,X DKV 2,,35
+XDKV2-017,KHANSA SYAHIRA,X DKV 2,,87
+XDKV2-018,LIONEL,X DKV 2,,32
+XDKV2-019,MAHESSA NAUFAL ROBBANI,X DKV 2,,93
+XDKV2-020,MARLIN FEBRIANTI,X DKV 2,,72
+XDKV2-021,MAURA VEGA HERDIANSYAH,X DKV 2,,94
+XDKV2-022,MILKHA AMANDA LEO GUNADI,X DKV 2,,89
+XDKV2-023,MILKY EHAO ZEBUA,X DKV 2,,88
+XDKV2-024,NASYWA YONA HERLINA,X DKV 2,,92
+XDKV2-025,NAYLA AZKIYA,X DKV 2,,58
+XDKV2-026,NENDA DWI LESTARI,X DKV 2,,94
+XDKV2-027,NINDY ARNELISTA,X DKV 2,,85
+XDKV2-028,PUTRI NUR ANATASYA,X DKV 2,,61
+XDKV2-029,RAFAEL SIRAIT,X DKV 2,,57
+XDKV2-030,RIZKI NURDIANSYAH,X DKV 2,,90
+XDKV2-031,SAHWAHITA AGISTA EKADISTY,X DKV 2,,86
+XDKV2-032,SAMUEL PEBRIAN GULO,X DKV 2,,56
+XDKV2-033,SANIA KHOTUL RAMADANI,X DKV 2,,79
+XDKV2-034,TEUNGKU SULTANA MULIYA,X DKV 2,,66
+XDKV2-035,VINO FERDINAN PUTRA,X DKV 2,,54
+XDKV2-036,ZAKY SETIAWAN PRASTYO,X DKV 2,,53
+XDKV3-001,ALFATHUR FACHRYAN,X DKV 3,,57
+XDKV3-002,ALIF PANJI KURNIAWAN,X DKV 3,,45
+XDKV3-003,ALISYA OCTAVIANI,X DKV 3,,87
+XDKV3-004,ALMIRA NUR SAFANA,X DKV 3,,96
+XDKV3-005,ANDREAS WICAKSONO,X DKV 3,,85
+XDKV3-006,ANDROMEDA GALIH RENDA PRASETYO,X DKV 3,,76
+XDKV3-007,ARIFAH NUR RAHMAH,X DKV 3,,90
+XDKV3-008,AZZAHRO NUR KHASANAH,X DKV 3,,77
+XDKV3-009,BAIHAQI EFENDI,X DKV 3,,77
+XDKV3-010,FARAH ALDALIA,X DKV 3,,95
+XDKV3-011,FAUZI PRINGGO NURRATMO,X DKV 3,,95
+XDKV3-012,FERRYANSYAH ABDULLAH,X DKV 3,,92
+XDKV3-013,FIEBI PRHAMITA ATHENA,X DKV 3,,68
+XDKV3-014,JAZZTIAN BENIEZER WARBUNG,X DKV 3,,92
+XDKV3-015,KAILA RAMADHANI KHOLIS,X DKV 3,,92
+XDKV3-016,KENZIE ADINA MAASEYA,X DKV 3,,90
+XDKV3-017,LAELATUNNADA,X DKV 3,,63
+XDKV3-018,LUTFIA ZIARITITA,X DKV 3,,90
+XDKV3-019,MAULANA DANISH ANIQ,X DKV 3,,69
+XDKV3-020,MIFTAHUL RIZKA ADN HAFIZAH,X DKV 3,,68
+XDKV3-021,MIFTAHURRAHMAT,X DKV 3,,92
+XDKV3-022,MUHAMMAD AUFA ASSIDQI,X DKV 3,,95
+XDKV3-023,MUHAMMAD BINTANG NUGRAHA,X DKV 3,,71
+XDKV3-024,MUHAMMAD FAKHRI NUR ADJI,X DKV 3,,56
+XDKV3-025,NAFISAH AVIONICA RAMADHANI,X DKV 3,,88
+XDKV3-026,NANDA LARASSATI,X DKV 3,,96
+XDKV3-027,REZA PUTRA FAUZIAN,X DKV 3,,12
+XDKV3-028,RIZKIA AYU RAHMADANI,X DKV 3,,95
+XDKV3-029,SESILIA PUTRI,X DKV 3,,88
+XDKV3-030,SHOVIA CAHYA PRAYUDO,X DKV 3,,74
+XDKV3-031,SITI ASTUTI RAMADANI,X DKV 3,,88
+XDKV3-032,SITI BAHIRAH DHAFIYAH,X DKV 3,,90
+XDKV3-033,SYAFA NAYZILLA ZULFA,X DKV 3,,86
+XDKV3-034,TIUR DEVITA SIMORANGKIR,X DKV 3,,79
+XDKV3-035,YOLANDA DWI RAMADANTI,X DKV 3,,88
+XDKV3-036,ZHASKI CELSILYA ANGGIADITA HAMDANI,X DKV 3,,96
+XDKV4-001,AYUDHYA MAULIDAYANTI RACHMAN,X DKV 4,,94
+XDKV4-002,BERLIAN PRAMESWARIE WINNADYU,X DKV 4,,72
+XDKV4-003,DUED YONADA KEY,X DKV 4,,97
+XDKV4-004,FAJRIL AUSTIN WAHIB,X DKV 4,,73
+XDKV4-005,FRANANDA ALFARIZI SUWANTO,X DKV 4,,70
+XDKV4-006,GAYATRI PRAMUNDDITA MAHESWARI,X DKV 4,,92
+XDKV4-007,HAFEEZUR RAHMAN AL MALIK,X DKV 4,,98
+XDKV4-008,IVANNA ZHAFIRA FASABILLAH,X DKV 4,,93
+XDKV4-009,JESSLYN OLIVIA JOSEPH,X DKV 4,,69
+XDKV4-010,JUSTINE ARKA XENA MAHESWARA,X DKV 4,,33
+XDKV4-011,KHAIRUL FAHRI SAKTIAWAN,X DKV 4,,92
+XDKV4-012,KHALIFAH MUHAMMAD AL FAIQ,X DKV 4,,21
+XDKV4-013,LINTANG ANUGRAH AZHAR,X DKV 4,,50
+XDKV4-014,MUHAMAD ALIF FATHURRAHMAN,X DKV 4,,45
+XDKV4-015,MUHAMAD AZRIEL FAHREZA,X DKV 4,,79
+XDKV4-016,MUHAMAD FATAN AL FAIZ,X DKV 4,,35
+XDKV4-017,MUHAMAD SABIL AL-QURHI,X DKV 4,,29
+XDKV4-018,MUHAMMAD AJI SAPUTRA,X DKV 4,,98
+XDKV4-019,MUHAMMAD ALBARA YASUMURA,X DKV 4,,44
+XDKV4-020,MUHAMMAD AZIZ NUGROHO,X DKV 4,,66
+XDKV4-021,MUHAMMAD FAHLEVI,X DKV 4,,76
+XDKV4-022,MUHAMMAD FALAH AL HAFIZH,X DKV 4,,86
+XDKV4-023,MUHAMMAD ZAKIN,X DKV 4,,90
+XDKV4-024,NAUFAL YOGASWARA,X DKV 4,,80
+XDKV4-025,NAZIFA NUR HAFIZHAH,X DKV 4,,99
+XDKV4-026,PASKAH GIOVANI ARNOLD LUMBAN GAOL,X DKV 4,,65
+XDKV4-027,RAAFI ADNAN MEIDIANTARA,X DKV 4,,94
+XDKV4-028,REIZO ALTHAF ALIANSYAH,X DKV 4,,85
+XDKV4-029,REZKYTA AFIARENTIKO,X DKV 4,,93
+XDKV4-030,RIVAI FERDINANSYAH,X DKV 4,,91
+XDKV4-031,SITI NURLAELA SARI,X DKV 4,,91
+XDKV4-032,SITI UMALIYAH,X DKV 4,,99
+XDKV4-033,STEVEN BENJAMIN IMANNUEL,X DKV 4,,86
+XDKV4-034,SYAVIENA FAIHA MELIDA,X DKV 4,,94
+XDKV4-035,ZAFERINO MARBUN,X DKV 4,,86
+`;
+/* ============================================================ */
+
+(function(){
+  var $ = function(id){ return document.getElementById(id); };
+
+  function parseCSV(text){
+    var lines = text.trim().split(/\r?\n/).filter(function(l){ return l.trim() !== ""; });
+    if(!lines.length) return {};
+    var first = lines[0];
+    var delim = first.indexOf("\t") > -1 ? "\t" : (first.split(";").length > first.split(",").length ? ";" : ",");
+    var head = lines[0].split(delim).map(function(h){ return h.trim().toLowerCase(); });
+    var db = {};
+    for(var i=1;i<lines.length;i++){
+      var c = lines[i].split(delim);
+      var row = {};
+      head.forEach(function(h,idx){ row[h] = (c[idx] || "").trim(); });
+      var k = norm(row.kode);
+      if(!k) continue;
+      db[k] = {
+        kode: row.kode,
+        nama: row.nama || "",
+        kelas: row.kelas || "",
+        dkgv: toNum(row.dkgv),
+        koding: toNum(row.koding)
+      };
+    }
+    return db;
+  }
+  function toNum(v){
+    if(v === undefined || v === null || String(v).trim() === "") return null;
+    var n = parseFloat(String(v).replace(",", "."));
+    return isNaN(n) ? null : n;
+  }
+  function norm(s){ return String(s || "").trim().toUpperCase().replace(/\s+/g, ""); }
+
+  var DB = parseCSV(CSV_DATA);
+  var MAPEL = { dkgv: "Desain Komputer Grafis dan Visual", koding: "Koding dan Kecerdasan Artifisial" };
+  var current = null;
+
+  function show(id){
+    ["vLogin","vMenu","vHasil"].forEach(function(v){ $(v).hidden = (v !== id); });
+  }
+
+  function login(){
+    var k = norm($("kode").value);
+    var err = $("err");
+    if(!k){ err.textContent = "Isi kode nomor peserta dulu."; err.hidden = false; return; }
+    var s = DB[k];
+    if(!s){ err.textContent = "Kode tidak ditemukan. Cek lagi, pastikan sama persis seperti di kartu peserta."; err.hidden = false; return; }
+    err.hidden = true;
+    current = s;
+    $("nm").textContent = s.nama; $("kd").textContent = s.kode + " · " + s.kelas;
+    $("nm2").textContent = s.nama; $("kd2").textContent = s.kode + " · " + s.kelas;
+    show("vMenu");
+  }
+
+  function keterangan(n){
+    if(n < 70) return { cls: "s-bad", text: "Remed loh yahh" };
+    if(n <= 75) return { cls: "s-mid", text: "Remed gak yah?" };
+    return { cls: "s-good", text: "CONGRATSS!!" };
+  }
+
+  function tampil(key){
+    var n = current[key];
+    var wrap = $("scoreWrap");
+    $("mpName").textContent = "Nilai UTS " + MAPEL[key];
+    wrap.className = "score-wrap pop";
+    if(n === null){
+      wrap.classList.add("s-none");
+      $("score").textContent = "Belum ada";
+      $("msg").textContent = "Nilai belum diinput guru";
+    } else {
+      var r = keterangan(n);
+      wrap.classList.add(r.cls);
+      $("score").textContent = (n % 1 === 0) ? String(n) : n.toFixed(1);
+      $("msg").textContent = r.text;
+    }
+    show("vHasil");
+    // restart animation
+    void wrap.offsetWidth;
+  }
+
+  function keluar(){
+    current = null;
+    $("kode").value = "";
+    $("err").hidden = true;
+    show("vLogin");
+    $("kode").focus();
+  }
+
+  $("btnLogin").addEventListener("click", login);
+  $("kode").addEventListener("keydown", function(e){ if(e.key === "Enter") login(); });
+  $("btnKeluar1").addEventListener("click", keluar);
+  $("btnKeluar2").addEventListener("click", keluar);
+  $("btnBack").addEventListener("click", function(){ show("vMenu"); });
+  Array.prototype.forEach.call(document.querySelectorAll(".mapel"), function(b){
+    b.addEventListener("click", function(){ tampil(b.getAttribute("data-key")); });
+  });
+})();
+</script>
+</body>
+</html>
