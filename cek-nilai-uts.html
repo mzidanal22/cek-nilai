@@ -284,7 +284,7 @@ textarea:focus{outline:3px solid var(--accent);outline-offset:1px;border-color:v
   <!-- RATING -->
   <section class="card" id="vRate" hidden>
     <h2>Kasih rating</h2>
-    <p class="hint">Gimana pendapatmu soal website cek nilai ini?</p>
+    <p class="hint" id="rateHint"></p>
     <div class="stars" id="stars" role="radiogroup" aria-label="Rating bintang"></div>
     <label for="komen">Komentar</label>
     <textarea id="komen" rows="3" maxlength="200" placeholder="Tulis komentar kamu (maks 200 huruf)"></textarea>
@@ -678,7 +678,7 @@ XIDKV4-036,ZALFA ATSILAH ZAHRO,XI DKV 4,,,88
 
   function show(id){
     ["vLogin","vMenu","vHasil"].forEach(function(v){ $(v).hidden = (v !== id); });
-    $("vRate").hidden = (id !== "vMenu");
+    $("vRate").hidden = (id !== "vHasil");
   }
 
   function normUser(s){ return String(s || "").normalize("NFKC").trim().toLowerCase().replace(/\s+/g, " "); }
@@ -729,7 +729,6 @@ XIDKV4-036,ZALFA ATSILAH ZAHRO,XI DKV 4,,,88
     if(!s){ salahDenganEfek(); return; }
     err.hidden = true;
     current = s;
-    siapRating();
     $("nm").textContent = s.nama; $("kd").textContent = s.kelas;
     $("nm2").textContent = s.nama; $("kd2").textContent = s.kelas;
     Array.prototype.forEach.call(document.querySelectorAll(".mapel"), function(b){
@@ -759,6 +758,7 @@ XIDKV4-036,ZALFA ATSILAH ZAHRO,XI DKV 4,,,88
       $("score").textContent = (n % 1 === 0) ? String(n) : n.toFixed(1);
       $("msg").textContent = r.text;
     }
+    curKey = key; siapRating();
     show("vHasil");
     // restart animation
     void wrap.offsetWidth;
@@ -856,7 +856,7 @@ XIDKV4-036,ZALFA ATSILAH ZAHRO,XI DKV 4,,,88
 
 
   /* ===== RATING ===== */
-  var LKEY = "rating_lokal_v1", bintang = 0, remote = null;
+  var LKEY = "rating_lokal_v1", bintang = 0, remote = null, curKey = null;
   function lokal(){ try{ return JSON.parse(localStorage.getItem(LKEY)) || []; }catch(e){ return []; } }
   function simpanLokal(r){
     var a = lokal().filter(function(x){ return x.kode !== r.kode; }); a.push(r);
@@ -864,8 +864,8 @@ XIDKV4-036,ZALFA ATSILAH ZAHRO,XI DKV 4,,,88
   }
   function semuaRating(){
     var m = {};
-    [].concat(window.RATING_DATA || [], remote || [], lokal()).forEach(function(r){ if(r && r.kode) m[r.kode] = r; });
-    return Object.keys(m).map(function(k){ return m[k]; }).sort(function(a,b){ return String(b.waktu).localeCompare(String(a.waktu)); });
+    [].concat(window.RATING_DATA || [], remote || [], lokal()).forEach(function(r){ if(r && r.kode && r.mapel) m[r.kode + "|" + r.mapel] = r; });
+    return Object.keys(m).map(function(k){ return m[k]; }).filter(function(r){ return r.mapel === curKey; }).sort(function(a,b){ return String(b.waktu).localeCompare(String(a.waktu)); });
   }
   function gambarBintang(){
     var box = $("stars"); box.innerHTML = "";
@@ -899,6 +899,7 @@ XIDKV4-036,ZALFA ATSILAH ZAHRO,XI DKV 4,,,88
   }
   function siapRating(){
     var ada = semuaRating().filter(function(r){ return r.kode === current.kode; })[0];
+    $("rateHint").textContent = "Gimana menurut kamu mapel " + MAPEL[curKey] + "?";
     bintang = ada ? +ada.bintang : 0; $("komen").value = ada ? (ada.komen || "") : "";
     $("rateMsg").textContent = ada ? "Kamu sudah pernah kasih rating, boleh diubah." : "";
     gambarBintang(); renderRating();
@@ -911,7 +912,7 @@ XIDKV4-036,ZALFA ATSILAH ZAHRO,XI DKV 4,,,88
     var msg = $("rateMsg");
     if(!bintang){ msg.textContent = "Pilih bintang dulu ya."; return; }
     var depan = current.nama.split(" ")[0].toLowerCase(); depan = depan.charAt(0).toUpperCase() + depan.slice(1);
-    var r = { kode: current.kode, nama: depan, kelas: current.kelas, bintang: bintang,
+    var r = { kode: current.kode, nama: depan, kelas: current.kelas, mapel: curKey, bintang: bintang,
               komen: $("komen").value.trim().slice(0,200), waktu: new Date().toISOString() };
     simpanLokal(r);
     if(window.RATING_API){
