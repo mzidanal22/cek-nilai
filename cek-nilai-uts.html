@@ -142,6 +142,10 @@ input:focus{outline:3px solid var(--accent);outline-offset:1px;border-color:var(
 .badge{display:inline-block;margin-top:6px;padding:2px 10px;border-radius:999px;font-size:.82rem;font-weight:700}
 .b-done{background:var(--good-bg);color:var(--good)}
 .b-wait{background:var(--mid-bg);color:var(--mid)}
+.b-new{background:#e6194b;color:#fff;margin-left:6px;letter-spacing:.04em;animation:newp 1.6s ease-in-out infinite}
+@keyframes newp{50%{transform:scale(1.08)}}
+@media (prefers-reduced-motion:reduce){.b-new{animation:none}}
+.rate-back{margin-top:10px}
 .mapel .t{font-family:var(--display);font-weight:700;font-size:1.2rem;line-height:1.1}
 .score-wrap{text-align:center;padding:8px 0 4px}
 .mp-name{font-weight:700;color:var(--muted);margin:0 0 4px}
@@ -247,7 +251,7 @@ textarea:focus{outline:3px solid var(--accent);outline-offset:1px;border-color:v
         <span class="ic" aria-hidden="true">
           <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 0 18c1.4 0 2-.9 2-1.8 0-1.2-.9-1.5-.9-2.6 0-1 .8-1.6 1.8-1.6H17a4 4 0 0 0 4-4C21 6.8 17 3 12 3z"/><circle cx="7.5" cy="11" r="1" fill="currentColor"/><circle cx="10.5" cy="7.5" r="1" fill="currentColor"/><circle cx="15" cy="7.5" r="1" fill="currentColor"/></svg>
         </span>
-        <span><span class="t" style="display:block">Desain Komputer Grafis dan Visual</span><span class="badge b-done">Sudah Dinilai</span></span>
+        <span><span class="t" style="display:block">Desain Komputer Grafis dan Visual</span><span class="badge b-done">Sudah Dinilai</span><span class="badge b-new">NEW</span></span>
       </button>
       <button class="mapel" type="button" data-key="koding" data-tk="X">
         <span class="ic" aria-hidden="true">
@@ -283,12 +287,13 @@ textarea:focus{outline:3px solid var(--accent);outline-offset:1px;border-color:v
 
   <!-- RATING -->
   <section class="card" id="vRate" hidden>
-    <h2>Kasih rating</h2>
+    <h2>Rating dulu yaa</h2>
     <p class="hint" id="rateHint"></p>
-    <div class="stars" id="stars" role="radiogroup" aria-label="Rating bintang"></div>
-    <label for="komen">Komentar</label>
-    <textarea id="komen" rows="3" maxlength="200" placeholder="Tulis komentar kamu (maks 200 huruf)"></textarea>
-    <button class="btn" id="btnRate" type="button">Kirim rating</button>
+    <div class="stars" id="stars" role="radiogroup" aria-label="Rating bintang (wajib)" aria-required="true"></div>
+    <label for="komen">Komentar (wajib)</label>
+    <textarea id="komen" rows="3" aria-required="true" maxlength="200" placeholder="Tulis komentar kamu (maks 200 huruf)"></textarea>
+    <button class="btn" id="btnRate" type="button">Kirim &amp; lihat nilai</button>
+    <button class="link rate-back" id="btnRateBack" type="button">Balik ke menu</button>
     <p class="hint" id="rateMsg" role="status" style="margin:10px 0 0"></p>
     <div class="avg" id="rateAvg"></div>
     <div id="rateList"></div>
@@ -677,8 +682,7 @@ XIDKV4-036,ZALFA ATSILAH ZAHRO,XI DKV 4,,,88
   var current = null;
 
   function show(id){
-    ["vLogin","vMenu","vHasil"].forEach(function(v){ $(v).hidden = (v !== id); });
-    $("vRate").hidden = (id !== "vHasil");
+    ["vLogin","vMenu","vRate","vHasil"].forEach(function(v){ $(v).hidden = (v !== id); });
   }
 
   function normUser(s){ return String(s || "").normalize("NFKC").trim().toLowerCase().replace(/\s+/g, " "); }
@@ -728,7 +732,7 @@ XIDKV4-036,ZALFA ATSILAH ZAHRO,XI DKV 4,,,88
     var s = Object.prototype.hasOwnProperty.call(USERNAMES, k) ? DB[norm(USERNAMES[k])] : null;
     if(!s){ salahDenganEfek(); return; }
     err.hidden = true;
-    current = s;
+    current = s; muatRemote();
     $("nm").textContent = s.nama; $("kd").textContent = s.kelas;
     $("nm2").textContent = s.nama; $("kd2").textContent = s.kelas;
     Array.prototype.forEach.call(document.querySelectorAll(".mapel"), function(b){
@@ -758,8 +762,7 @@ XIDKV4-036,ZALFA ATSILAH ZAHRO,XI DKV 4,,,88
       $("score").textContent = (n % 1 === 0) ? String(n) : n.toFixed(1);
       $("msg").textContent = r.text;
     }
-    curKey = key; siapRating();
-    show("vHasil");
+    curKey = key; show("vHasil");
     // restart animation
     void wrap.offsetWidth;
   }
@@ -814,41 +817,31 @@ XIDKV4-036,ZALFA ATSILAH ZAHRO,XI DKV 4,,,88
   function sekuens(k){
     batalSekuens();
     var ov = $("ov2"), txt = $("fText"), cnt = $("fCount");
-    $("fEmo").textContent = "😒";
-    txt.className = "q";
-    txt.textContent = "dih gituu, yauda nihh lahh, malass";
-    cnt.hidden = true;
-    ov.hidden = false;
-    // 1) notif "dih gituu..." 2.2 dtk -> 2) PRANK 3 dtk -> 3) hitung mundur 3-2-1 -> nilai
-    seqTimers.push(setTimeout(function(){
-      $("fEmo").textContent = "🤡";
-      txt.className = "q prank";
-      txt.textContent = "PRANK";
-      seqTimers.push(setTimeout(function(){
-        $("fEmo").textContent = "⏳";
-        txt.className = "q";
-        txt.textContent = "Nilainya keluar dalam...";
-        cnt.hidden = false;
-        var n = 3;
-        (function tick(){
-          cnt.textContent = n;
-          cnt.classList.remove("tick"); void cnt.offsetWidth; cnt.classList.add("tick");
-          if(n === 1){ return; }
-          n--;
-          seqTimers.push(setTimeout(tick, 900));
-        })();
-        // setelah 3,2,1 selesai (3 tick + jeda), buka nilai
-        seqTimers.push(setTimeout(function(){ batalSekuens(); tampil(k); }, 900 * 3));
-      }, 3000));
-    }, 2200));
+    $("fEmo").textContent = "\u23f3";
+    txt.className = "q"; txt.textContent = "Nilainya keluar dalam...";
+    cnt.hidden = false; ov.hidden = false;
+    var n = 3;
+    (function tick(){
+      cnt.textContent = n;
+      cnt.classList.remove("tick"); void cnt.offsetWidth; cnt.classList.add("tick");
+      if(n === 1){ return; }
+      n--;
+      seqTimers.push(setTimeout(tick, 900));
+    })();
+    seqTimers.push(setTimeout(function(){ batalSekuens(); tampil(k); }, 900 * 3));
   }
-
+  var menunggu = null;
+  function mintaRating(k){
+    curKey = k; siapRating();
+    if(current[k] === null || sudahRating()){ sekuens(k); }
+    else { menunggu = k; show("vRate"); }
+  }
 
   $("cYes").addEventListener("click", function(){
     if(step < STEPS.length - 1){ step++; renderStep(); return; }
     var k = pending;
     $("ov").hidden = true; pending = null;
-    sekuens(k);
+    mintaRating(k);
   });
   $("cNo").addEventListener("click", tutupKonfirmasi);
   $("ov").addEventListener("click", function(e){ if(e.target === $("ov")) tutupKonfirmasi(); });
@@ -899,29 +892,35 @@ XIDKV4-036,ZALFA ATSILAH ZAHRO,XI DKV 4,,,88
   }
   function siapRating(){
     var ada = semuaRating().filter(function(r){ return r.kode === current.kode; })[0];
-    $("rateHint").textContent = "Gimana menurut kamu mapel " + MAPEL[curKey] + "?";
+    $("rateHint").textContent = "Sebelum nilai " + MAPEL[curKey] + " keluar, kasih bintang dan komentar dulu ya (dua-duanya wajib).";
     bintang = ada ? +ada.bintang : 0; $("komen").value = ada ? (ada.komen || "") : "";
     $("rateMsg").textContent = ada ? "Kamu sudah pernah kasih rating, boleh diubah." : "";
     gambarBintang(); renderRating();
-    if(window.RATING_API){
-      fetch(window.RATING_API).then(function(r){ return r.json(); })
-        .then(function(d){ remote = d; renderRating(); }).catch(function(){});
-    }
   }
+  function muatRemote(){
+    if(!window.RATING_API) return;
+    fetch(window.RATING_API).then(function(r){ return r.json(); })
+      .then(function(d){ remote = d; renderRating(); }).catch(function(){});
+  }
+  function sudahRating(){ return semuaRating().some(function(r){ return r.kode === current.kode; }); }
   function kirimRating(){
     var msg = $("rateMsg");
+    var komen = $("komen").value.trim();
     if(!bintang){ msg.textContent = "Pilih bintang dulu ya."; return; }
+    if(!komen){ msg.textContent = "Komentarnya wajib diisi ya."; $("komen").focus(); return; }
     var depan = current.nama.split(" ")[0].toLowerCase(); depan = depan.charAt(0).toUpperCase() + depan.slice(1);
     var r = { kode: current.kode, nama: depan, kelas: current.kelas, mapel: curKey, bintang: bintang,
-              komen: $("komen").value.trim().slice(0,200), waktu: new Date().toISOString() };
+              komen: komen.slice(0,200), waktu: new Date().toISOString() };
     simpanLokal(r);
     if(window.RATING_API){
       fetch(window.RATING_API, { method:"POST", mode:"no-cors", headers:{"Content-Type":"text/plain"}, body: JSON.stringify(r) })
         .catch(function(){});
     }
-    msg.textContent = "Makasih! Rating kamu sudah terkirim."; renderRating();
+    msg.textContent = ""; renderRating();
+    var k = menunggu; menunggu = null; show("vMenu"); if(k) sekuens(k);
   }
   $("btnRate").addEventListener("click", kirimRating);
+  $("btnRateBack").addEventListener("click", function(){ menunggu = null; show("vMenu"); });
 
   $("btnLogin").addEventListener("click", login);
   $("kode").addEventListener("keydown", function(e){ if(e.key === "Enter") login(); });
